@@ -31,7 +31,10 @@ public class AHTranslator {
 	private Map missingTranslation = new Map();
 
 	private String currentLanguage;
+	private String currentCountry;
 	private String currentFile;
+	private String currentExtension = ".lng";
+	private String defaultLanguage = "";
 	//private String currentDir;
 
 	public AHTranslator() {
@@ -44,11 +47,10 @@ public class AHTranslator {
 	 */
 	public void Initialize(String dir, String basename) throws IOException {
 
-		translation.Initialize();
-		missingTranslation.Initialize();
 		currentLanguage = java.util.Locale.getDefault().getLanguage();
+		currentCountry = java.util.Locale.getDefault().getCountry();
 
-		LoadTranslation(dir, basename, currentLanguage);
+		Initialize3(dir, basename, currentLanguage, currentCountry);
 	}
 
 	/**
@@ -58,26 +60,73 @@ public class AHTranslator {
 	public void Initialize2(String dir, String basename, String language)
 			throws IOException {
 
-		translation.Initialize();
-		missingTranslation.Initialize();
-		LoadTranslation(dir, basename, language);
+		Initialize3(dir, basename, language, null);
 	}
 
-	private void LoadTranslation(String dir, String file, String language)
+	/**
+	 * Initializes a translation object with the given language and country code.
+	 * Tries to read a translation file with the following name
+	 * convention: basename_language_country.lng 
+	 */
+	public void Initialize3(String dir, String basename, String language, String country)
 			throws IOException {
 
-		String filename = file + "_" + language + ".lng";
-		currentFile = filename;
-		currentLanguage = language;
-
+		translation.Initialize();
+		missingTranslation.Initialize();
 		translation.Clear();
 		missingTranslation.Clear();
+
+		if (defaultLanguage != null & defaultLanguage != "") {
+			LoadDefaultTranslations(dir, basename);
+		}
+		LoadTranslation(dir, basename, language, country);
+	}
+
+	private void LoadDefaultTranslations(String dir, String file) throws IOException {
+		String filename;
+		
+		filename = file + "_" + defaultLanguage + currentExtension;
 
 		if (File.Exists(dir, filename)) {
 			translation = File.ReadMap(dir, filename);
 		}
 		else if (File.Exists(File.getDirAssets(), filename)) {
 			translation = File.ReadMap(dir, filename);
+		}
+}
+	
+	private void LoadTranslation(String dir, String file, String language, String country)
+			throws IOException {
+
+		String filename;
+		
+		currentLanguage = language;
+		currentCountry = country;
+		if (country != null & country != "") {
+			filename = file + "_" + language + "_" + country + currentExtension;
+			
+			if (!File.Exists(dir, filename)) {
+				filename = file + "_" + language + currentExtension;
+				currentCountry = "";
+			}
+		}
+		else {
+			filename = file + "_" + language + currentExtension;
+		}
+		currentFile = filename;
+
+		Map localTranslation = new Map();
+		localTranslation.Initialize();
+		
+		if (File.Exists(dir, filename)) {
+			localTranslation = File.ReadMap(dir, filename);
+		}
+		else if (File.Exists(File.getDirAssets(), filename)) {
+			localTranslation = File.ReadMap(dir, filename);
+		}
+		
+		for (int i=0; i<localTranslation.getSize(); i++) {
+			translation.Put(localTranslation.GetKeyAt(i), localTranslation.GetValueAt(i));
 		}
 	}
 
@@ -89,12 +138,12 @@ public class AHTranslator {
 	public void WriteTranslation(String dir, String filename)
 			throws IOException {
 		if (translation.getSize() > 0) {
-			File.WriteMap(dir, filename + "_" + currentLanguage + ".lng",
+			File.WriteMap(dir, filename + "_" + currentLanguage + currentExtension,
 					translation);
 		}
 
 		if (missingTranslation.getSize() > 0) {
-			File.WriteMap(dir, filename + "_miss_" + currentLanguage + ".lng",
+			File.WriteMap(dir, filename + "_miss_" + currentLanguage + currentExtension,
 					missingTranslation);
 		}
 	}
@@ -176,10 +225,39 @@ public class AHTranslator {
 	}
 	
 	/**
+	 * Returns the current County code
+	 */
+	public String getCurrentCountry() {
+		return currentCountry;
+	}
+	
+	/**
 	 * Returns current file name of language file
 	 */
 	public String getCurrentFile() {
 		return currentFile;
 	}
 	
+	/**
+	 * Sets or gets the current file extension
+	 */
+	public String getExtension() {
+		return currentExtension;
+	}
+	
+	public void setExtension(String Extension) {
+		currentExtension = Extension;
+	}
+	
+	/**
+	 * Sets or gets the default language. This is the language used when no language file is found.
+	 * If you don't set it the default language will be empty and is not used.
+	 */
+	public String getDefaultLanguage() {
+		return defaultLanguage;
+	}
+	
+	public void setDefaultLanguage(String Language) {
+		defaultLanguage = Language;
+	}
 }

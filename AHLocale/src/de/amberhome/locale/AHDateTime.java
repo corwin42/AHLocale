@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import android.text.format.DateFormat;
+import anywheresoftware.b4a.BA;
 import anywheresoftware.b4a.BA.ShortName;
 
 /**
@@ -22,6 +24,12 @@ public class AHDateTime {
 	private SimpleDateFormat sdf;
 	private String pattern = "yyyy-MM-dd HH:mm:ss";
 
+	public final int DEFAULT = SimpleDateFormat.DEFAULT;
+	public final int SHORT = SimpleDateFormat.SHORT;
+	public final int MEDIUM = SimpleDateFormat.MEDIUM;
+	public final int LONG = SimpleDateFormat.LONG;
+	public final int FULL = SimpleDateFormat.FULL;
+	
 	public AHDateTime() {
 	}
 
@@ -101,7 +109,6 @@ public class AHDateTime {
 	
 	/**
 	 * Sets or gets the timezone for the AHDateTime object
-	 * @param TimeZone
 	 */
 	public void setTimeZone(AHTimezone TimeZone) {
 		sdf.setTimeZone(TimeZone.tz);
@@ -111,5 +118,85 @@ public class AHDateTime {
 		AHTimezone tz = new AHTimezone();
 		tz.Initialize_internal(sdf.getTimeZone());
 		return tz;
+	}
+	
+	/**
+	 * Gets the default TimePattern of the device default locale
+	 *  
+	 * Style - Use constants SHORT, MEDIUM, LONG, FULL, DEFAULT
+	 */
+	public String GetDefaultTimePattern(BA ba, int Style) {
+		SimpleDateFormat sf = (SimpleDateFormat) SimpleDateFormat.getTimeInstance(Style);
+		return sf.toPattern();
+	}
+	
+	/**
+	 * Gets the default TimePattern of given locale
+	 *  
+	 * Style - Use constants SHORT, MEDIUM, LONG, FULL, DEFAULT
+	 * Locale - Reference to an AHLocale object
+	 */
+	public String GetDefaultTimePattern2(int Style, AHLocale Locale) {
+		SimpleDateFormat sf = (SimpleDateFormat) SimpleDateFormat.getTimeInstance(Style, Locale.myLocale);
+		return sf.toPattern();
+	}
+	
+	/**
+	 * Return a short date pattern without year information
+	 */
+	public String GetShortDatePatternWithoutYear() {
+		SimpleDateFormat sf = (SimpleDateFormat) SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
+		return sf.toPattern().replaceAll("\\W?[Yy]+\\W?", "");
+	}
+	
+	
+	/**
+	 * Gets the default DatePattern of the device default locale
+	 *  
+	 * Style - Use constants SHORT, MEDIUM, LONG, FULL, DEFAULT
+	 */
+	public String GetDefaultDatePattern(int Style) {
+		SimpleDateFormat sf = (SimpleDateFormat) SimpleDateFormat.getDateInstance(Style);
+		return sf.toPattern();
+	}
+
+	/**
+	 * Gets the default DatePattern of given locale
+	 *  
+	 * Style - Use constants SHORT, MEDIUM, LONG, FULL, DEFAULT
+	 * Locale - Reference to an AHLocale object
+	 */
+	public String GetDefaultDatePattern2(int Style, AHLocale Locale) {
+		SimpleDateFormat sf = (SimpleDateFormat) SimpleDateFormat.getDateInstance(Style, Locale.myLocale);
+		return sf.toPattern();
+	}
+	
+	/**
+	 * Gets the device default DateTimePattern
+	 * 
+	 * DateStyle - Style for Date
+	 * TimeStyle - Style for Time
+	 */
+	public String GetDefaultDateTimePattern(int DateStyle, int TimeStyle) {
+		SimpleDateFormat sf = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance(DateStyle, TimeStyle);
+		return sf.toPattern();		
+	}
+
+	/**
+	 * Gets the DateTimePattern for the given Locale
+	 * 
+	 * DateStyle - Style for Date
+	 * TimeStyle - Style for Time
+	 */
+	public String GetDefaultDateTimePattern2(int DateStyle, int TimeStyle, AHLocale Locale) {
+		SimpleDateFormat sf = (SimpleDateFormat) SimpleDateFormat.getDateTimeInstance(DateStyle, TimeStyle, Locale.myLocale);
+		return sf.toPattern();		
+	}
+
+	/**
+	 * Returns true if the user preference settings is 24 hour format.
+	 */
+	public boolean is24HourFormat(BA ba) {
+		return DateFormat.is24HourFormat(ba.context);
 	}
 }

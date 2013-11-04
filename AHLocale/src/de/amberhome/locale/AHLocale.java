@@ -15,6 +15,10 @@
 // 1.16:
 //   - Rename all classes to AHxxx notation
 //   - Prepare for GitHub upload
+//   - AHDateTime - Methods for getting default date and time format strings
+//   - AHTranslation - Support for Countries
+//   - AHTranslation - Support for default language
+//   - AHTranslation - Support for different file extensions
 
 package de.amberhome.locale;
 
@@ -37,7 +41,7 @@ import anywheresoftware.b4a.objects.collections.List;
  * or which languages and countries can be used.
  */
 @ShortName("AHLocale")
-@Version(1.15f)
+@Version(1.16f)
 @Author("Markus Stipp")
 public class AHLocale {
 
@@ -75,7 +79,7 @@ public class AHLocale {
 	public void Initialize3(String language, String country) {
 		init(new Locale(language, country));
 	}
-
+	
 	/**
 	 * Initializes the AHLocale Object with <strong>en_US</strong> locale. This locale is
 	 * available on every device.
